@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --sidebar-width: 260px;
+  }
+
+  body {
+    @apply bg-qy-bg text-silver-100 antialiased;
+  }
+
+  * {
+    @apply border-qy-border;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-qy-bg;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-qyburn-800 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-qyburn-700;
+  }
+}
+
+@layer components {
+  /* Card component */
+  .qy-card {
+    @apply bg-qy-surface rounded-xl border border-qy-border p-6
+           shadow-sm shadow-qyburn-950/20
+           hover:shadow-md hover:shadow-qyburn-900/30
+           transition-shadow duration-200;
+  }
+
+  /* Button base */
+  .qy-btn {
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg px-4 py-2 text-sm font-medium
+           transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-qyburn-500/50 focus:ring-offset-2 focus:ring-offset-qy-bg
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .qy-btn-primary {
+    @apply qy-btn bg-qyburn-600 text-white hover:bg-qyburn-500 active:bg-qyburn-700;
+  }
+
+  .qy-btn-secondary {
+    @apply qy-btn bg-qy-surface-light text-silver-200 border border-qy-border
+           hover:bg-qyburn-900/50 hover:text-white;
+  }
+
+  .qy-btn-accent {
+    @apply qy-btn bg-wildfire-600 text-white hover:bg-wildfire-500 active:bg-wildfire-700;
+  }
+
+  .qy-btn-danger {
+    @apply qy-btn bg-danger text-white hover:bg-red-500 active:bg-red-700;
+  }
+
+  /* Badge */
+  .qy-badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5
+           text-xs font-medium;
+  }
+
+  .qy-badge-purple {
+    @apply qy-badge bg-qyburn-900/60 text-qyburn-300;
+  }
+
+  .qy-badge-green {
+    @apply qy-badge bg-wildfire-900/60 text-wildfire-300;
+  }
+
+  .qy-badge-silver {
+    @apply qy-badge bg-silver-800/60 text-silver-300;
+  }
+
+  /* Table */
+  .qy-table {
+    @apply w-full text-sm;
+  }
+
+  .qy-table thead {
+    @apply bg-qyburn-900/80 text-silver-200;
+  }
+
+  .qy-table th {
+    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider;
+  }
+
+  .qy-table tbody tr {
+    @apply border-b border-qy-border transition-colors hover:bg-qy-surface-light/50;
+  }
+
+  .qy-table tbody tr:nth-child(even) {
+    @apply bg-qy-surface/50;
+  }
+
+  .qy-table td {
+    @apply px-4 py-3;
+  }
+
+  /* Skeleton shimmer */
+  .qy-skeleton {
+    @apply bg-gradient-to-r from-qy-surface via-qy-surface-light to-qy-surface
+           bg-[length:200%_100%] animate-shimmer rounded;
+  }
+
+  /* Input */
+  .qy-input {
+    @apply w-full rounded-lg bg-qy-surface border border-qy-border px-3 py-2
+           text-sm text-silver-100 placeholder-silver-500
+           focus:outline-none focus:ring-2 focus:ring-qyburn-500/50 focus:border-qyburn-500
+           transition-colors;
+  }
+}

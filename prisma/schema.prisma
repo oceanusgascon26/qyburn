@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── License Catalog ─────────────────────────────────────────
+
+model License {
+  id          String   @id @default(cuid())
+  name        String
+  vendor      String
+  sku         String?
+  totalSeats  Int      @default(0)
+  usedSeats   Int      @default(0)
+  costPerSeat Float?
+  autoApprove Boolean  @default(false)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assignments LicenseAssignment[]
+
+  @@map("licenses")
+}
+
+model LicenseAssignment {
+  id         String   @id @default(cuid())
+  licenseId  String
+  userId     String
+  userEmail  String
+  assignedAt DateTime @default(now())
+  assignedBy String
+
+  license License @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@unique([licenseId, userId])
+  @@map("license_assignments")
+}
+
+// ─── Restricted Groups ───────────────────────────────────────
+
+model RestrictedGroup {
+  id            String   @id @default(cuid())
+  azureGroupId  String   @unique
+  displayName   String
+  description   String?
+  approverEmail String
+  requiresJustification Boolean @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  requests GroupAccessRequest[]
+
+  @@map("restricted_groups")
+}
+
+model GroupAccessRequest {
+  id            String   @id @default(cuid())
+  groupId       String
+  requesterId   String
+  requesterEmail String
+  justification String?
+  status        String   @default("pending") // pending | approved | denied
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  group RestrictedGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@map("group_access_requests")
+}
+
+// ─── Onboarding Templates ────────────────────────────────────
+
+model OnboardingTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  department  String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  steps OnboardingStep[]
+
+  @@map("onboarding_templates")
+}
+
+model OnboardingStep {
+  id          String   @id @default(cuid())
+  templateId  String
+  order       Int
+  title       String
+  description String?
+  type        String   // license | group | message | custom
+  config      String?  // JSON config for the step
+  createdAt   DateTime @default(now())
+
+  template OnboardingTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_steps")
+}
+
+// ─── Audit Log ───────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actor      String   // user email or "qyburn-bot"
+  action     String   // e.g., "license.assign", "group.approve"
+  target     String?  // e.g., license name, group name
+  targetId   String?
+  details    String?  // JSON details
+  channel    String?  // Slack channel if applicable
+  createdAt  DateTime @default(now())
+
+  @@index([actor])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ─── Knowledge Base ──────────────────────────────────────────
+
+model KnowledgeDocument {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  category  String?
+  tags      String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chunks KnowledgeChunk[]
+
+  @@map("knowledge_documents")
+}
+
+model KnowledgeChunk {
+  id         String   @id @default(cuid())
+  documentId String
+  content    String
+  // embedding  Unsupported("vector(1536)")? // pgvector — uncomment when extension is ready
+  chunkIndex Int
+  createdAt  DateTime @default(now())
+
+  document KnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("knowledge_chunks")
+}
+
+// ─── Bot Config ──────────────────────────────────────────────
+
+model BotConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+
+  @@map("bot_config")
+}
