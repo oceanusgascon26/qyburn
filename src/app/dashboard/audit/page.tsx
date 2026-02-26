@@ -11,6 +11,7 @@ import {
   Bot,
   Filter,
   Clock,
+  Download,
 } from "lucide-react";
 import type { AuditLogEntry } from "@/lib/mock-data";
 
@@ -132,6 +133,30 @@ export default function AuditPage() {
     });
   }, [logs, search, actionFilter, actorFilter]);
 
+  const exportCSV = useCallback(() => {
+    const headers = ["Time", "Action", "Actor", "Target", "Channel", "Details"];
+    const rows = filtered.map((log) => [
+      new Date(log.createdAt).toISOString(),
+      log.action,
+      log.actor,
+      log.target ?? "",
+      log.channel ?? "",
+      log.details ?? "",
+    ]);
+    const csv = [headers, ...rows]
+      .map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+      )
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `qyburn-audit-${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }, [filtered]);
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -142,6 +167,14 @@ export default function AuditPage() {
             {logs.length} total events &middot; showing {filtered.length}
           </p>
         </div>
+        <button
+          onClick={exportCSV}
+          className="qy-btn-secondary"
+          disabled={filtered.length === 0}
+        >
+          <Download className="h-4 w-4" />
+          Export CSV
+        </button>
       </div>
 
       {/* Filters */}

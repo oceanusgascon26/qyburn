@@ -1,0 +1,16 @@
+# Bot process — separate container
+FROM node:20-alpine
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+COPY .npmrc ./
+RUN npm ci --omit=dev
+
+COPY tsconfig.json ./
+COPY bot/ ./bot/
+COPY src/lib/ ./src/lib/
+
+# Install tsx for running TypeScript
+RUN npm install tsx
+
+CMD ["npx", "tsx", "bot/index.ts"]

@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: qyburn
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Next.js admin dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/qyburn?schema=public
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: qyburn-docker-secret-change-in-prod
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN:-xoxb-stub-token}
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN:-xapp-stub-token}
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:-stub-tenant-id}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-stub-client-id}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET:-stub-client-secret}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-sk-ant-stub-key}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Slack bot process
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/qyburn?schema=public
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN:-xoxb-stub-token}
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN:-xapp-stub-token}
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:-stub-tenant-id}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-stub-client-id}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET:-stub-client-secret}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-sk-ant-stub-key}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

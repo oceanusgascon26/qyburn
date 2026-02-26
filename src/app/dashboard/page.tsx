@@ -14,6 +14,9 @@ import {
   RefreshCw,
 } from "lucide-react";
 import type { AuditLogEntry } from "@/lib/mock-data";
+import { RequestVolumeChart } from "@/components/charts/RequestVolumeChart";
+import { LicenseUsageChart } from "@/components/charts/LicenseUsageChart";
+import { useSSE } from "@/lib/use-sse";
 
 interface DashboardStats {
   activeLicenses: number;
@@ -71,6 +74,18 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Real-time updates via SSE
+  useSSE(
+    useCallback(
+      (type: string) => {
+        if (type === "activity" || type === "stats") {
+          fetchData();
+        }
+      },
+      [fetchData]
+    )
+  );
 
   const statCards = stats
     ? [
@@ -160,6 +175,22 @@ export default function DashboardPage() {
           ))}
         </div>
       )}
+
+      {/* Charts row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="qy-card">
+          <h2 className="text-lg font-semibold text-white mb-4">
+            Request Volume (7-day)
+          </h2>
+          <RequestVolumeChart />
+        </div>
+        <div className="qy-card">
+          <h2 className="text-lg font-semibold text-white mb-4">
+            License Seat Usage
+          </h2>
+          <LicenseUsageChart />
+        </div>
+      </div>
 
       {/* Two columns */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

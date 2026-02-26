@@ -11,6 +11,8 @@ import {
   ArrowRight,
   Flame,
 } from "lucide-react";
+import { ResponseTimeChart } from "@/components/charts/ResponseTimeChart";
+import { ConversationPieChart } from "@/components/charts/ConversationPieChart";
 
 const botStats = [
   {
@@ -41,14 +43,6 @@ const botStats = [
     color: "text-wildfire-400",
     bg: "bg-wildfire-900/40",
   },
-];
-
-const activityBreakdown = [
-  { label: "License Requests", count: 28, pct: 34, color: "bg-qyburn-500" },
-  { label: "KB Queries", count: 22, pct: 27, color: "bg-blue-500" },
-  { label: "Group Access", count: 15, pct: 18, color: "bg-wildfire-500" },
-  { label: "Password Help", count: 12, pct: 14, color: "bg-yellow-500" },
-  { label: "Other", count: 6, pct: 7, color: "bg-silver-500" },
 ];
 
 interface Conversation {
@@ -126,35 +120,6 @@ const recentConversations: Conversation[] = [
   },
 ];
 
-function StatBar({
-  label,
-  count,
-  pct,
-  color,
-}: {
-  label: string;
-  count: number;
-  pct: number;
-  color: string;
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-sm text-silver-300 w-32 flex-shrink-0">
-        {label}
-      </span>
-      <div className="flex-1 h-3 rounded-full bg-qy-surface-light overflow-hidden">
-        <div
-          className={`h-full rounded-full ${color} transition-all duration-700`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <span className="text-xs text-silver-400 w-16 text-right font-mono">
-        {count} ({pct}%)
-      </span>
-    </div>
-  );
-}
-
 export default function ActivityPage() {
   return (
     <div className="space-y-6 animate-fade-in">
@@ -193,100 +158,99 @@ export default function ActivityPage() {
         ))}
       </div>
 
-      {/* Two columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Activity breakdown */}
+      {/* Charts row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="qy-card">
-          <div className="flex items-center gap-2 mb-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Zap className="h-5 w-5 text-yellow-400" />
+            <h2 className="text-lg font-semibold text-white">
+              Response Time (24h)
+            </h2>
+          </div>
+          <ResponseTimeChart />
+        </div>
+        <div className="qy-card">
+          <div className="flex items-center gap-2 mb-4">
             <Flame className="h-5 w-5 text-wildfire-400" />
             <h2 className="text-lg font-semibold text-white">
-              Activity Breakdown
+              Conversation Types
             </h2>
           </div>
-          <div className="space-y-3">
-            {activityBreakdown.map((item) => (
-              <StatBar key={item.label} {...item} />
-            ))}
-          </div>
-          <div className="mt-4 pt-3 border-t border-qy-border text-center">
-            <p className="text-xs text-silver-500">
-              Based on last 24 hours of activity
-            </p>
-          </div>
+          <ConversationPieChart />
         </div>
+      </div>
 
-        {/* Recent conversations */}
-        <div className="lg:col-span-2 qy-card">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-semibold text-white">
-              Recent Conversations
-            </h2>
-            <span className="qy-badge-purple">
-              {recentConversations.length} conversations
-            </span>
-          </div>
-          <div className="space-y-4">
-            {recentConversations.map((conv) => (
-              <div
-                key={conv.id}
-                className="bg-qy-surface-light/30 rounded-lg p-4 border border-qy-border/50"
-              >
-                {/* Header */}
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="h-7 w-7 rounded-full bg-qyburn-800 flex items-center justify-center">
-                      <span className="text-[10px] font-bold text-qyburn-300">
-                        {conv.avatar}
-                      </span>
-                    </div>
-                    <span className="text-sm font-medium text-white">
-                      {conv.user}
+      {/* Recent conversations */}
+      <div className="qy-card">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-semibold text-white">
+            Recent Conversations
+          </h2>
+          <span className="qy-badge-purple">
+            {recentConversations.length} conversations
+          </span>
+        </div>
+        <div className="space-y-4">
+          {recentConversations.map((conv) => (
+            <div
+              key={conv.id}
+              className="bg-qy-surface-light/30 rounded-lg p-4 border border-qy-border/50"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-full bg-qyburn-800 flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-qyburn-300">
+                      {conv.avatar}
                     </span>
-                    <ArrowRight className="h-3 w-3 text-silver-600" />
-                    <div className="flex items-center gap-1">
-                      <Bot className="h-3.5 w-3.5 text-wildfire-400" />
-                      <span className="text-sm text-wildfire-400">Qyburn</span>
-                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[11px] text-silver-500 font-mono flex items-center gap-1">
-                      <Zap className="h-3 w-3" />
-                      {conv.responseTime}
-                    </span>
-                    <span className="text-xs text-silver-500">{conv.time}</span>
-                  </div>
-                </div>
-                {/* Query & Response */}
-                <div className="space-y-2 ml-9">
-                  <div className="flex items-start gap-2">
-                    <User className="h-3.5 w-3.5 text-silver-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-silver-300">{conv.query}</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Bot className="h-3.5 w-3.5 text-qyburn-400 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-silver-400">{conv.response}</p>
-                  </div>
-                </div>
-                {/* Footer */}
-                <div className="flex items-center gap-2 mt-2 ml-9">
-                  <span className="qy-badge-purple text-[10px]">
-                    {conv.type}
+                  <span className="text-sm font-medium text-white">
+                    {conv.user}
                   </span>
-                  {conv.resolved ? (
-                    <span className="qy-badge-green text-[10px] flex items-center gap-0.5">
-                      <CheckCircle2 className="h-3 w-3" />
-                      Resolved
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-0.5 qy-badge bg-yellow-900/40 text-yellow-300 text-[10px]">
-                      <Clock className="h-3 w-3" />
-                      Pending
-                    </span>
-                  )}
+                  <ArrowRight className="h-3 w-3 text-silver-600" />
+                  <div className="flex items-center gap-1">
+                    <Bot className="h-3.5 w-3.5 text-wildfire-400" />
+                    <span className="text-sm text-wildfire-400">Qyburn</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-silver-500 font-mono flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    {conv.responseTime}
+                  </span>
+                  <span className="text-xs text-silver-500">{conv.time}</span>
                 </div>
               </div>
-            ))}
-          </div>
+              {/* Query & Response */}
+              <div className="space-y-2 ml-9">
+                <div className="flex items-start gap-2">
+                  <User className="h-3.5 w-3.5 text-silver-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-silver-300">{conv.query}</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Bot className="h-3.5 w-3.5 text-qyburn-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-silver-400">{conv.response}</p>
+                </div>
+              </div>
+              {/* Footer */}
+              <div className="flex items-center gap-2 mt-2 ml-9">
+                <span className="qy-badge-purple text-[10px]">
+                  {conv.type}
+                </span>
+                {conv.resolved ? (
+                  <span className="qy-badge-green text-[10px] flex items-center gap-0.5">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Resolved
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-0.5 qy-badge bg-yellow-900/40 text-yellow-300 text-[10px]">
+                    <Clock className="h-3 w-3" />
+                    Pending
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

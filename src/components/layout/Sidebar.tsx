@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   KeyRound,
@@ -14,9 +15,12 @@ import {
   Flame,
   Menu,
   X,
+  LogOut,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { NotificationBell } from "@/components/ui/NotificationBell";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -31,6 +35,22 @@ const navigation = [
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const userInitials = session?.user?.name
+    ? session.user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "SA";
+
+  const userName = session?.user?.name ?? "SAGA Admin";
+  const userRole =
+    (session?.user as { role?: string })?.role === "admin"
+      ? "Admin"
+      : "Viewer";
 
   return (
     <>
@@ -39,7 +59,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-qyburn-700">
           <Flame className="h-5 w-5 text-wildfire-400" />
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-lg font-bold text-white tracking-tight">
             Qyburn
           </h1>
@@ -47,6 +67,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             IT Admin
           </p>
         </div>
+        <NotificationBell />
       </div>
 
       {/* Navigation */}
@@ -83,14 +104,23 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <div className="border-t border-qy-border px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-qyburn-700 flex items-center justify-center">
-            <span className="text-xs font-bold text-qyburn-200">SA</span>
+            <span className="text-xs font-bold text-qyburn-200">
+              {userInitials}
+            </span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-silver-200 truncate">
-              SAGA Admin
+              {userName}
             </p>
-            <p className="text-xs text-silver-500 truncate">IT Department</p>
+            <p className="text-xs text-silver-500 truncate">{userRole}</p>
           </div>
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="p-1.5 rounded-lg text-silver-500 hover:text-red-400 hover:bg-red-900/20 transition-colors"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </>

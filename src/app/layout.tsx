@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, DM_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { SessionProvider } from "@/components/providers/SessionProvider";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${dmSans.variable} ${dmMono.variable}`}>
       <body className="font-sans">
+        <SessionProvider>
         {children}
         <Toaster
           theme="dark"
@@ -41,6 +43,7 @@ export default function RootLayout({
             },
           }}
         />
+        </SessionProvider>
       </body>
     </html>
   );
