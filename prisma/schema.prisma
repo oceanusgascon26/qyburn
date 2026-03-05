@@ -272,3 +272,113 @@ model PromptVersion {
   @@unique([module, version])
   @@map("prompt_versions")
 }
+
+// ─── Proactive Messages ─────────────────────────────────────
+
+model ProactiveMessage {
+  id           String   @id @default(cuid())
+  type         String
+  userId       String
+  userEmail    String
+  channel      String?
+  message      String
+  scheduledFor DateTime
+  sent         Boolean  @default(false)
+  sentAt       DateTime?
+  response     String?  // user's response action
+  createdAt    DateTime @default(now())
+
+  @@index([sent, scheduledFor])
+  @@index([userId])
+  @@map("proactive_messages")
+}
+
+// ─── IT Anomalies ───────────────────────────────────────────
+
+model ITAnomaly {
+  id           String   @id @default(cuid())
+  type         String
+  severity     String
+  userId       String?
+  userEmail    String?
+  description  String
+  details      String?  // JSON
+  acknowledged Boolean  @default(false)
+  acknowledgedBy String?
+  createdAt    DateTime @default(now())
+
+  @@index([severity])
+  @@index([acknowledged])
+  @@map("it_anomalies")
+}
+
+// ─── Health Checks ──────────────────────────────────────────
+
+model HealthCheckResult {
+  id        String   @id @default(cuid())
+  type      String
+  status    String
+  score     Int
+  details   String?
+  createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([createdAt])
+  @@map("health_check_results")
+}
+
+// ─── Agent Workflows ────────────────────────────────────────
+
+model AgentWorkflow {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      String   @default("running") // running | completed | failed | paused
+  triggeredBy String
+  context     String?  // JSON
+  currentStep Int      @default(0)
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+
+  steps AgentWorkflowStep[]
+
+  @@index([status])
+  @@map("agent_workflows")
+}
+
+model AgentWorkflowStep {
+  id          String   @id @default(cuid())
+  workflowId  String
+  stepIndex   Int
+  action      String
+  description String
+  input       String?  // JSON
+  output      String?  // JSON
+  status      String   @default("pending")
+  error       String?
+  approvedBy  String?
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  workflow AgentWorkflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId])
+  @@map("agent_workflow_steps")
+}
+
+// ─── Integration Sync Log ───────────────────────────────────
+
+model IntegrationSync {
+  id           String   @id @default(cuid())
+  integration  String
+  direction    String   // inbound | outbound
+  entityType   String
+  recordCount  Int      @default(0)
+  status       String   // success | failed | partial
+  errorMessage String?
+  syncedAt     DateTime @default(now())
+
+  @@index([integration])
+  @@index([syncedAt])
+  @@map("integration_syncs")
+}

@@ -18,6 +18,10 @@ import {
   X,
   LogOut,
   Bell,
+  BarChart3,
+  MessageSquarePlus,
+  Plug,
+  Workflow,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
@@ -32,6 +36,10 @@ const navigation = [
   { name: "Knowledge Base", href: "/dashboard/knowledge", icon: BookOpen },
   { name: "Bot Activity", href: "/dashboard/activity", icon: Bot },
   { name: "Conversations", href: "/dashboard/conversations", icon: MessageSquare },
+  { name: "IT Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+  { name: "Proactive Messages", href: "/dashboard/proactive", icon: MessageSquarePlus },
+  { name: "Integrations", href: "/dashboard/integrations", icon: Plug },
+  { name: "Agent Workflows", href: "/dashboard/agents", icon: Workflow },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
