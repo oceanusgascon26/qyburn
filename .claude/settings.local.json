@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(npm install:*)",
+      "Bash(npx next:*)",
+      "Bash(npm ls:*)",
+      "Bash(rm:*)",
+      "Bash(npm config:*)",
+      "Bash(npx tsx:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(xargs wc:*)",
+      "Bash(npm run:*)",
+      "Bash(where nircmd:*)",
+      "Bash(npx:*)",
+      "Bash(mkdir:*)",
+      "Bash(node:*)",
+      "Bash(echo:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Bash(git:*)",
+      "Bash(npm test:*)",
+      "Bash(curl:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(tasklist:*)",
+      "Bash(taskkill:*)"
+    ]
+  }
+}
