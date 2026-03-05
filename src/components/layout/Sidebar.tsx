@@ -12,6 +12,7 @@ import {
   BookOpen,
   Settings,
   Bot,
+  MessageSquare,
   Flame,
   Menu,
   X,
@@ -30,6 +31,7 @@ const navigation = [
   { name: "Audit Log", href: "/dashboard/audit", icon: ScrollText },
   { name: "Knowledge Base", href: "/dashboard/knowledge", icon: BookOpen },
   { name: "Bot Activity", href: "/dashboard/activity", icon: Bot },
+  { name: "Conversations", href: "/dashboard/conversations", icon: MessageSquare },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
