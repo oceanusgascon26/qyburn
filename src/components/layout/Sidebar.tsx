@@ -22,6 +22,11 @@ import {
   MessageSquarePlus,
   Plug,
   Workflow,
+  Building2,
+  Zap,
+  Gauge,
+  Wrench,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
@@ -40,6 +45,11 @@ const navigation = [
   { name: "Proactive Messages", href: "/dashboard/proactive", icon: MessageSquarePlus },
   { name: "Integrations", href: "/dashboard/integrations", icon: Plug },
   { name: "Agent Workflows", href: "/dashboard/agents", icon: Workflow },
+  { name: "Enterprise", href: "/dashboard/enterprise", icon: Building2 },
+  { name: "Autonomous Ops", href: "/dashboard/autonomous", icon: Zap },
+  { name: "Executive", href: "/dashboard/executive", icon: Gauge },
+  { name: "Operations", href: "/dashboard/operations", icon: Wrench },
+  { name: "Reports", href: "/dashboard/reports", icon: FileText },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

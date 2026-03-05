@@ -382,3 +382,147 @@ model IntegrationSync {
   @@index([syncedAt])
   @@map("integration_syncs")
 }
+
+// ─── Access Reviews ─────────────────────────────────────────
+
+model AccessReview {
+  id            String   @id @default(cuid())
+  groupId       String
+  groupName     String
+  reviewerId    String
+  reviewerEmail String
+  status        String   @default("pending")
+  dueDate       DateTime
+  createdAt     DateTime @default(now())
+  completedAt   DateTime?
+
+  decisions AccessReviewDecision[]
+
+  @@index([status])
+  @@map("access_reviews")
+}
+
+model AccessReviewDecision {
+  id        String   @id @default(cuid())
+  reviewId  String
+  userId    String
+  userEmail String
+  decision  String?  // keep | revoke
+  decidedAt DateTime?
+
+  review AccessReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@map("access_review_decisions")
+}
+
+// ─── Shadow IT ──────────────────────────────────────────────
+
+model ShadowITDetection {
+  id                    String   @id @default(cuid())
+  appName               String
+  category              String
+  usersDetected         Int      @default(0)
+  riskLevel             String
+  sanctionedAlternative String?
+  status                String   @default("detected") // detected | notified | resolved | accepted
+  firstSeen             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([appName])
+  @@map("shadow_it_detections")
+}
+
+// ─── Remediation ────────────────────────────────────────────
+
+model RemediationEvent {
+  id        String   @id @default(cuid())
+  ruleId    String
+  ruleName  String
+  userId    String?
+  userEmail String?
+  action    String
+  result    String   // success | failed | escalated
+  details   String?
+  createdAt DateTime @default(now())
+
+  @@index([ruleId])
+  @@index([createdAt])
+  @@map("remediation_events")
+}
+
+// ─── Runbook Executions ─────────────────────────────────────
+
+model RunbookExecution {
+  id          String   @id @default(cuid())
+  runbookId   String
+  runbookName String
+  executor    String
+  status      String   @default("running") // running | completed | failed | rolled_back
+  params      String?  // JSON
+  stepResults String?  // JSON
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+
+  @@index([runbookId])
+  @@map("runbook_executions")
+}
+
+// ─── Incidents ──────────────────────────────────────────────
+
+model Incident {
+  id              String   @id @default(cuid())
+  title           String
+  severity        String
+  status          String   @default("detecting")
+  affectedUsers   String[] @default([])
+  symptoms        String[] @default([])
+  possibleCause   String?
+  jiraTicketKey   String?
+  statusUpdates   String?  // JSON array
+  startedAt       DateTime @default(now())
+  resolvedAt      DateTime?
+
+  @@index([severity])
+  @@index([status])
+  @@map("incidents")
+}
+
+// ─── Scheduled Changes ──────────────────────────────────────
+
+model ScheduledChange {
+  id              String   @id @default(cuid())
+  title           String
+  description     String?
+  type            String
+  scheduledStart  DateTime
+  scheduledEnd    DateTime
+  affectedSystems String[] @default([])
+  riskLevel       String   @default("low")
+  status          String   @default("planned")
+  rollbackPlan    String?
+  owner           String
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  @@index([scheduledStart])
+  @@index([status])
+  @@map("scheduled_changes")
+}
+
+// ─── IT Reports ─────────────────────────────────────────────
+
+model ITReport {
+  id            String   @id @default(cuid())
+  name          String
+  type          String
+  config        String?  // JSON
+  schedule      String?
+  recipients    String[] @default([])
+  lastGenerated DateTime?
+  output        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("it_reports")
+}
